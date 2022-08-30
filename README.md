@@ -6,7 +6,7 @@
 
 # 安装教程
 
-0. 打开[最新版本下载链接](https://github.com/zhang0281/GunfireRebornMod/releases/latest) 并下载 ```GRmod安装包.zip``` 如果网络不是特别好的用户可以下载 ```GRmod安装包(含依赖).zip``` 来安装。
+0. 打开[最新版本下载链接](https://github.com/zhang0281/GRMod/releases/latest) 并下载 ```GRmod.zip``` 如果网络不是特别好的用户可以下载 ```GRmod with dll.zip``` 来安装。
 1. 解压到 GunfireReborn 的游戏根目录下。
 2. 
     注意：含依赖的版本是会随着游戏更新而失效的。这时候可能需要到[MelonLoader最新版本下载链接](https://github.com/LavaGang/MelonLoader/releases/latest)下载最新版本的``` MelonLoader.x64.zip ``` 来安装一个干净的MelonLoader。
