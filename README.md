@@ -1,8 +1,21 @@
-# 枪火重生-辅助瞄准+显示信息mod
+# GunfireReborn-辅助瞄准+显示信息mod
 
 本项目基于 [pentium1131](https://github.com/pentium1131) 的 [GunfireReborn-aimbot](https://github.com/pentium1131/GunfireReborn-aimbot) 项目，
 
 [Hkl146](https://github.com/Hkl146) 的 [GunfireReborn_MTMOD](https://github.com/Hkl146/GunfireReborn_MTMOD) 项目 和 [GUNINFO](https://github.com/Hkl146/GUNINFO) 项目 修改而来。
+
+# 安装教程
+
+0. 打开[最新版本下载链接](https://github.com/zhang0281/GunfireRebornMod/releases/latest) 并下载 ```GRmod安装包.zip``` 如果网络不是特别好的用户可以下载 ```GRmod安装包(含依赖).zip``` 来安装。
+1. 解压到 GunfireReborn 的游戏根目录下。
+2. 
+    注意：含依赖的版本是会随着游戏更新而失效的。这时候可能需要到[MelonLoader最新版本下载链接](https://github.com/LavaGang/MelonLoader/releases/latest)下载最新版本的``` MelonLoader.x64.zip ``` 来安装一个干净的MelonLoader。
+    
+    将MelonLoader的压缩包解压至游戏根目录下即可完成MelonLoader的安装。
+
+    安装完MelonLoader后运行一次游戏。
+    
+    之后在游戏根目录下创建```Mods```文件夹，将安装包zip内的```Mods```文件夹下的```GRMod.dll```复制进游戏根目录下的```Mods```文件夹中即可。
 
 # 使用方法
 
