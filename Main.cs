@@ -14,7 +14,7 @@ namespace GRMod
         public const string Description = "Gunfire Reborn Mod. Original Author pentium1131 And Hkl146. Modified By zhang"; // Description for the Mod.  (Set as null if none)
         public const string Author = "zhang"; // Author of the Mod.  (Set as null if none)
         public const string Company = null; // Company that made the Mod.  (Set as null if none)
-        public const string Version = "2.0.0"; // Version of the Mod.  (MUST BE SET)
+        public const string Version = "2.1.0"; // Version of the Mod.  (MUST BE SET)
         public const string DownloadLink = "https://github.com/zhang0281/GRMod/releases/latest"; // Download Link for the Mod.  (Set as null if none)
     }
 
