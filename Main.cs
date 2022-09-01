@@ -5,7 +5,6 @@ using System;
 using HeroCameraName;
 using Item;
 using DataHelper;
-using UnhollowerBaseLib;
 
 namespace GRMod
 {
@@ -16,14 +15,14 @@ namespace GRMod
         public const string Author = "zhang"; // Author of the Mod.  (Set as null if none)
         public const string Company = null; // Company that made the Mod.  (Set as null if none)
         public const string Version = "2.0.0"; // Version of the Mod.  (MUST BE SET)
-        public const string DownloadLink = null; // Download Link for the Mod.  (Set as null if none)
+        public const string DownloadLink = "https://github.com/zhang0281/GRMod/releases/latest"; // Download Link for the Mod.  (Set as null if none)
     }
 
-    public class ZcMod : MelonMod
+    public class GRMod : MelonMod
     {
         public static bool shownpc = false;
         public static KeyCode showUIKey = KeyCode.Home;
-        public static KeyCode needinitKey = KeyCode.Insert; 
+        public static KeyCode needinitKey = KeyCode.Insert;
         public static bool showUI = false;
         public static KeyCode autoaimKey = KeyCode.F1;
         public static bool autoaim = false;
@@ -46,20 +45,23 @@ namespace GRMod
             {
                 needinit = !needinit;
             }
-            // 自瞄开关
+            // 辅助瞄准开关
             if (Input.GetKeyUp(autoaimKey))
             {
                 autoaim = !autoaim;
+                MelonLogger.Msg("辅助瞄准已" + (autoaim ? "开启" : "关闭"));
             }
             // 显示UI开关
             if (Input.GetKeyUp(showUIKey))
             {
                 showUI = !showUI;
+                MelonLogger.Msg("UI已" + (showUI ? "开启" : "关闭"));
             }
             // 武器增强开关
             if (Input.GetKeyUp(weaponEnhanceKey))
             {
                 weaponEnhance = !weaponEnhance;
+                MelonLogger.Msg("武器增强已" + (weaponEnhance ? "开启" : "关闭"));
             }
             // 透视开关
             if (Input.GetKey(shownpcKey))
@@ -70,20 +72,17 @@ namespace GRMod
             if (Input.GetKeyUp(playerEnhanceKey))
             {
                 playerEnhance = !playerEnhance;
+                MelonLogger.Msg("玩家增强已" + (playerEnhance ? "开启" : "关闭"));
             }
         }
 
-        public override void OnUpdate() // Runs once per frame.
+        public override void OnUpdate()
         {
             try
             {
                 // 初始化
                 if ((needinit) && HeroCameraManager.HeroObj != null && HeroCameraManager.HeroObj.BulletPreFormCom != null && HeroCameraManager.HeroObj.BulletPreFormCom.weapondict != null)
                 {
-                    IntPtr il2CppMethod = IL2CPP.GetIl2CppMethod(Il2CppClassPointerStore<CameraCtrl>.NativeClassPtr, false, "Recoil", "System.Void", new string[0]);
-                    IL2CPP.GetIl2CppMethod(Il2CppClassPointerStore<EnableDepthTexture>.NativeClassPtr, false, "Update", "System.Void", new string[0]);
-                    //noprecoil(Marshal.ReadInt64(il2CppMethod));
-
                     shownpc = false;
                     showUI = false;
                     autoaim = false;
@@ -99,7 +98,9 @@ namespace GRMod
                 {
                     foreach (KeyValuePair<int, WeaponPerformanceObj> weapon in HeroCameraManager.HeroObj.BulletPreFormCom.weapondict)
                     {
-                        weapon.value.ModifyBulletInMagzine(100, 100);
+                        // 弹药
+                        weapon.value.ModifyBulletInMagzine(200, 200);
+                        weapon.value.ReloadBulletImmediately();
                         //武器精确度
                         if (weapon.value.WeaponAttr.Stability[0] != 10000)
                         {
@@ -113,12 +114,9 @@ namespace GRMod
                         // 穿透 效果存疑
                         weapon.value.WeaponAttr.Pierce = 100;
                         //爆炸范围(会影响爆炸类武器、火标和电手套)
-                        if (weapon.value.WeaponAttr.Radius > 0f)
+                        if (weapon.value.WeaponAttr.Radius > 0f && weapon.value.WeaponAttr.Radius < 9f)
                         {
-                            if (weapon.value.WeaponAttr.Radius < 9f)
-                            {
-                                weapon.value.WeaponAttr.Radius = 9f;
-                            }
+                            weapon.value.WeaponAttr.Radius = 9f;
                         }
                         // 射程
                         if (weapon.value.WeaponAttr.AttDis != 9999f)
@@ -126,11 +124,11 @@ namespace GRMod
                             weapon.value.WeaponAttr.AttDis = 9999f;
                         }
                         // 换弹时间
-
                         if (weapon.value.WeaponAttr.FillTime[0] != 5)
                         {
                             weapon.value.WeaponAttr.FillTime[0] = 5;
                         }
+                        // 子弹速度
                         if (weapon.value.WeaponAttr.BulletSpeed >= 50f && weapon.value.WeaponAttr.BulletSpeed != 55f || weapon.value.WeaponAttr.BulletSpeed == 30f)
                         {
                             if (weapon.value.WeaponAttr.BulletSpeed != 100f)
@@ -166,58 +164,72 @@ namespace GRMod
                         HeroMoveManager.HMMJS.maxForwardSpeed = (HeroMoveManager.HMMJS.maxBackwardsSpeed = (HeroMoveManager.HMMJS.maxSidewaysSpeed = originSpeed));
                     }
                 }
-                // 自瞄
+                // 辅助瞄准
                 if (autoaim && (Input.GetKey(KeyCode.Mouse0) || Input.GetKey(KeyCode.Mouse1)))
                 {
                     List<NewPlayerObject> monsters = NewPlayerManager.GetMonsters();
+
                     if (monsters != null)
                     {
+
                         Vector3 campos = CameraManager.MainCamera.position;
                         Transform nearmons = null;
                         Transform monsterTransform = null;
                         float neardis = 500f;
+
                         foreach (var monster in monsters)
                         {
-                            // 不锁尸爆的
-                            if ((double)monster.BloodBarCom.BloodBar.hp >= 0.05)
+
+                            if (monster.BodyPartCom == null)
+                                continue;
+
+                            if (monster.BloodBarCom == null)
+                                continue;
+
+                            if (monster.BloodBarCom.BloodBar == null)
+                                continue;
+
+                            monsterTransform = monster.BodyPartCom.GetWeakTrans();
+
+                            if (monsterTransform == null)
+                                continue;
+
+                            Vector3 vector = CameraManager.MainCameraCom.WorldToViewportPoint(monsterTransform.position);
+
+                            bool flag = vector.x >= 0.45f && vector.x <= 0.55f;
+                            flag = flag && vector.y >= 0.45f && vector.y <= 0.55f;
+                            flag = flag && vector.z > 0f;
+                            if (flag)
                             {
-                                monsterTransform = monster.BodyPartCom.GetWeakTrans();
-                                // 无弱点不锁
-                                if (monsterTransform == null) continue;
-                                Vector3 vector = CameraManager.MainCameraCom.WorldToViewportPoint(monsterTransform.position);
-                                bool flag = false;
-                                if (vector.x >= 0.45f && vector.x <= 0.55f && vector.y >= 0.45f && vector.y <= 0.55f && vector.z > 0f)
+                                // 计算屏幕角度
+                                vector.y = 0f;
+                                vector.x = Screen.width * (0.5f - vector.x);
+                                vector.z = 0f;
+                            }
+                            else
+                                continue;
+
+                            vector = monsterTransform.position - campos;
+                            vector.y += 1.2f;
+                            float curdis = vector.magnitude;
+                            var hits = Physics.RaycastAll(new Ray(campos, vector), curdis);
+                            bool visible = true;
+
+                            foreach (RaycastHit raycastHit in hits)
+                            {
+                                if (raycastHit.collider.gameObject.layer == 0 || raycastHit.collider.gameObject.layer == 30 || raycastHit.collider.gameObject.layer == 31)
                                 {
-                                    // 计算屏幕角度
-                                    vector.y = 0f;
-                                    vector.x = 0.5f - vector.x;
-                                    vector.x = Screen.width * vector.x;
-                                    vector.z = 0f;
-                                    flag = true;
-                                }
-                                if (flag)
-                                {
-                                    vector = monsterTransform.position - campos;
-                                    vector.y += 1.2f;
-                                    float curdis = vector.magnitude;
-                                    var hits = Physics.RaycastAll(new Ray(campos, vector), curdis);
-                                    bool visible = true;
-                                    // 不锁不可视
-                                    foreach (RaycastHit raycastHit in hits)
-                                    {
-                                        if (raycastHit.collider.gameObject.layer == 0 || raycastHit.collider.gameObject.layer == 30 || raycastHit.collider.gameObject.layer == 31)
-                                        {
-                                            visible = false;
-                                            break;
-                                        }
-                                    }
-                                    if (visible && curdis < neardis)
-                                    {
-                                        neardis = curdis;
-                                        nearmons = monsterTransform;
-                                    }
+                                    visible = false;
+                                    break;
                                 }
                             }
+
+                            if (visible && curdis < neardis)
+                            {
+                                neardis = curdis;
+                                nearmons = monsterTransform;
+                            }
+
                         }
                         // 修改玩家摄像机角度并且瞄准
                         if (nearmons != null)
@@ -238,10 +250,9 @@ namespace GRMod
                     }
                 }
             }
-            catch
-            // (Exception ex)
+            catch (Exception ex)
             {
-                //MelonLogger.Msg("Exception:" + ex.ToString());
+                MelonLogger.Msg("异常:" + ex.ToString());
             }
         }
 
@@ -291,22 +302,22 @@ namespace GRMod
                     case ServerDefine.FightType.NWARRIOR_DROP_EQUIP: return true;
 
                     case ServerDefine.FightType.WARRIOR_OBSTACLE_NORMAL:
-                        if (obj.Shape == 4406 || obj.Shape == 4419 || obj.Shape == 4427) 
+                        if (obj.Shape == 4406 || obj.Shape == 4419 || obj.Shape == 4427)
                             return true;
                         break;
                     case ServerDefine.FightType.NWARRIOR_NPC_TRANSFER:
                         if (obj.Shape == 4016 || obj.Shape == 4009 || obj.Shape == 4019)
                             return true;
                         break;
-                    case ServerDefine.FightType.NWARRIOR_DROP_RELIC: 
-                    case ServerDefine.FightType.NWARRIOR_NPC_SMITH: 
-                    case ServerDefine.FightType.NWARRIOR_NPC_SHOP: 
-                    case ServerDefine.FightType.NWARRIOR_NPC_EVENT: 
-                    case ServerDefine.FightType.NWARRIOR_NPC_REFRESH: 
+                    case ServerDefine.FightType.NWARRIOR_DROP_RELIC:
+                    case ServerDefine.FightType.NWARRIOR_NPC_SMITH:
+                    case ServerDefine.FightType.NWARRIOR_NPC_SHOP:
+                    case ServerDefine.FightType.NWARRIOR_NPC_EVENT:
+                    case ServerDefine.FightType.NWARRIOR_NPC_REFRESH:
                     case ServerDefine.FightType.NWARRIOR_NPC_ITEMBOX:
                     case ServerDefine.FightType.NWARRIOR_NPC_GSCASHSHOP:
                         return true;
-                    default: 
+                    default:
                         return false;
                 }
             }

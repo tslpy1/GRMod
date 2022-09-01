@@ -9,7 +9,7 @@ using MelonLoader;
 [assembly: AssemblyTrademark(GRMod.BuildInfo.Company)]
 [assembly: AssemblyVersion(GRMod.BuildInfo.Version)]
 [assembly: AssemblyFileVersion(GRMod.BuildInfo.Version)]
-[assembly: MelonInfo(typeof(GRMod.ZcMod), GRMod.BuildInfo.Name, GRMod.BuildInfo.Version, GRMod.BuildInfo.Author, GRMod.BuildInfo.DownloadLink)]
+[assembly: MelonInfo(typeof(GRMod.GRMod), GRMod.BuildInfo.Name, GRMod.BuildInfo.Version, GRMod.BuildInfo.Author, GRMod.BuildInfo.DownloadLink)]
 [assembly: MelonColor()]
 
 // Create and Setup a MelonGame Attribute to mark a Melon as Universal or Compatible with specific Games.
